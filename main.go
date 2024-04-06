@@ -1,4 +1,4 @@
-package oim
+package main
 
 import "github.com/oim/cmd"
 
