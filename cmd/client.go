@@ -8,6 +8,7 @@ func init() {
 }
 
 var clientCmd = &cobra.Command{
+
 	Use:   "client",
 	Short: "client command",
 	Run:   clientCmdFunc,
