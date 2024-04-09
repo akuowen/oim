@@ -6,8 +6,13 @@ import (
 	"os"
 )
 
+var (
+	ConfigFile string
+)
+
 func init() {
 	cobra.OnFinalize(initOimConfig)
+	rootCmd.PersistentFlags().StringVar(&ConfigFile, "config", "./plato.yaml", "config file (default is ./plato.yaml)")
 }
 
 func initOimConfig() {
