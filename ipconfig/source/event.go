@@ -1,6 +1,9 @@
 package source
 
-import "github.com/oim/common/discovery"
+import (
+	"fmt"
+	"github.com/oim/common/discovery"
+)
 
 var eventChan chan *Event
 
@@ -44,4 +47,8 @@ func NewEvent(ed *discovery.EndpointInfoModel) *Event {
 		ConnectNum:   connNum,
 		MessageBytes: msgBytes,
 	}
+}
+
+func (event *Event) Key() string {
+	return fmt.Sprintf("%s:%s", event.Ip, event.Port)
 }
