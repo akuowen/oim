@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/oim/ipconfig/source"
+	"sort"
 )
 
 var dp *Dispatcher
@@ -28,6 +29,14 @@ type Dispatcher struct {
 	local map[string]*Point
 }
 
+func (d *Dispatcher) getCandidatePoint(ctx *GetIpContext) []*Point {
+	candidateList := make([]*Point, 0, len(dp.local))
+	for _, ed := range dp.local {
+		candidateList = append(candidateList, ed)
+	}
+	return candidateList
+}
+
 func Add(event *source.Event) {
 	point, ok := dp.local[event.Key()]
 	if !ok {
@@ -36,4 +45,25 @@ func Add(event *source.Event) {
 	}
 	point.UpdateStat(NewStatus(event.ConnectNum, event.MessageBytes))
 
+}
+
+func Dispatch(ctx *GetIpContext) []*Point {
+	points := dp.getCandidatePoint(ctx)
+	for _, point := range points {
+		point.CalculateScore(ctx)
+	}
+	// 排序
+	sort.Slice(points, func(i, j int) bool {
+		if points[i].ActiveScore > points[j].ActiveScore {
+			return true
+		}
+		if points[i].ActiveScore == points[j].ActiveScore {
+			if points[i].StaticScore > points[j].StaticScore {
+				return true
+			}
+			return false
+		}
+		return false
+	})
+	return points
 }
