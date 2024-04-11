@@ -6,12 +6,19 @@ import (
 )
 
 type Point struct {
-	Ip          string
-	Port        string
+	Ip          string `json:"ip"`
+	Port        string `json:"port"`
 	ActiveScore float64
 	StaticScore float64
 	Status      *Status
 	window      *window
+}
+
+func (p *Point) CalculateScore(ctx *GetIpContext) {
+	if p.Status != nil {
+		p.ActiveScore = p.Status.CalculateActiveScore()
+		p.StaticScore = p.Status.CalculateStaticScore()
+	}
 }
 
 func (ed *Point) UpdateStat(s *Status) {
