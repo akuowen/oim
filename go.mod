@@ -8,6 +8,7 @@ require (
 	github.com/spf13/viper v1.12.0
 	go.etcd.io/etcd/api/v3 v3.5.4
 	go.etcd.io/etcd/client/v3 v3.5.4
+	github.com/cloudwego/hertz v0.2.1
 )
 
 require (
