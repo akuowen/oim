@@ -1,5 +1,7 @@
 package domain
 
+import "math"
+
 type Status struct {
 	ConnectNums float64
 	MessageByte float64
@@ -39,4 +41,19 @@ func (s *Status) Clone() *Status {
 func (s *Status) Avg(num float64) {
 	s.ConnectNums /= num
 	s.MessageByte /= num
+}
+
+func decimal(value float64) float64 {
+	return math.Trunc(value*1e2+0.5) * 1e-2
+}
+
+func getGB(m float64) float64 {
+	return decimal(m / (1 << 30))
+}
+
+func (s *Status) CalculateActiveScore() float64 {
+	return getGB(s.MessageByte)
+}
+func (s *Status) CalculateStaticScore() float64 {
+	return s.ConnectNums
 }
