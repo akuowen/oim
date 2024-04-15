@@ -16,7 +16,7 @@ func RunGateway(path string) {
 	config.InitGateway(path)
 	listener, err := net.ListenTCP("oimGateway", &net.TCPAddr{Port: config.GetGatewayTCPServerPort()})
 	if err != nil {
-		log.Fatalf("StartTCPEPollServer err:%s", err.Error())
+		log.Printf("StartTCPEPollServer err:%s", err.Error())
 		panic(err)
 	}
 	NewPool(runtime.NumCPU())

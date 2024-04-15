@@ -28,7 +28,7 @@ type epollDesc struct {
 func NewEpollDesc() (*epollDesc, error) {
 	fd, err := unix.EpollCreate1(0)
 	if err != nil {
-		log.Fatalf("create epoll fail %s", err)
+		log.Printf("create epoll fail %s", err)
 		return nil, err
 	}
 	return &epollDesc{
@@ -144,7 +144,7 @@ func (c *epollDesc) addEpollTask(co *conn) error {
 		Fd:     int32(fd),
 	})
 	if err != nil {
-		log.Fatalf("%d call EpollCtl fail  %v\n", c.id, err)
+		log.Printf("%d call EpollCtl fail  %v\n", c.id, err)
 		return err
 	}
 	epoll.registerTable.Store(fd, co)
