@@ -8,13 +8,13 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-//ServiceDiscovery 服务发现
+// ServiceDiscovery 服务发现
 type ServiceDiscovery struct {
 	client *clientv3.Client
 	ctx    *context.Context
 }
 
-//NewServiceDiscovery  新建发现服务
+// NewServiceDiscovery  新建发现服务
 func NewServiceDiscovery(ctx *context.Context) *ServiceDiscovery {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   config.GetEndpointsForDiscovery(),
@@ -30,7 +30,7 @@ func NewServiceDiscovery(ctx *context.Context) *ServiceDiscovery {
 	}
 }
 
-//WatchService 初始化服务列表和监视
+// WatchService 初始化服务列表和监视
 func (s *ServiceDiscovery) WatchService(prefix string, set, del func(key, value string)) error {
 	//从存储中获取当前有的网关
 	resp, err := s.client.Get(*s.ctx, prefix, clientv3.WithPrefix())
