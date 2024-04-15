@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 const DISCOVERY string = "discovery.endpoints"
@@ -10,6 +11,12 @@ const TIMEOUT string = "discovery.timeout"
 const SERVICE_PATH string = "ip_conf.service_path"
 const ENV string = "global.env"
 const DEBUG string = "debug"
+
+func GetGatewayTCPServerPort() int {
+	return 8080
+}
+
+func InitGateway(path string) {}
 
 func InitConfig(path string) {
 	viper.SetConfigFile(path)
