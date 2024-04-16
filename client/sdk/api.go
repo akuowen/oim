@@ -23,3 +23,7 @@ func (c *Chat) Send(body *MessageBody) {
 func (c *Chat) Rev() <-chan *MessageBody {
 	return c.conn.rev()
 }
+
+func (chat *Chat) Close() {
+	chat.conn.close()
+}
