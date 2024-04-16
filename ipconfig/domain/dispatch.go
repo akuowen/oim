@@ -18,11 +18,16 @@ func Init() {
 				//调度器 更新的 操作
 				Add(event)
 			case source.DelNodeEvent:
+				Delete(event)
 				//调度器 删除的操作
 			}
 		}
 	}()
 
+}
+
+func Delete(event *source.Event) {
+	delete(dp.local, event.Key())
 }
 
 type Dispatcher struct {
