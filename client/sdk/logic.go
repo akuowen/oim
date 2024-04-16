@@ -1,5 +1,9 @@
 package sdk
 
+const (
+	MsgTypeText = "text"
+)
+
 type MessageBody struct {
 	Type    string
 	Name    string
