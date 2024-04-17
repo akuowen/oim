@@ -13,7 +13,7 @@ const ENV string = "global.env"
 const DEBUG string = "debug"
 
 func GetGatewayTCPServerPort() int {
-	return 8080
+	return 8900
 }
 
 func InitGateway(path string) {}

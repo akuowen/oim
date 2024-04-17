@@ -85,7 +85,7 @@ func doSay(g *gocui.Gui, cv *gocui.View) {
 		if p != nil {
 			msg := &sdk.MessageBody{
 				Type:    sdk.MsgTypeText,
-				Name:    "logic",
+				Name:    "akuowen",
 				From:    "123213",
 				To:      "222222",
 				Content: string(p)}
