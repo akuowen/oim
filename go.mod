@@ -11,6 +11,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	go.etcd.io/etcd/api/v3 v3.5.13
 	go.etcd.io/etcd/client/v3 v3.5.13
+	google.golang.org/grpc v1.63.2
 )
 
 require (
@@ -70,7 +71,6 @@ require (
 	golang.org/x/sys v0.19.0
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
-	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
