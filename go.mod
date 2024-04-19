@@ -1,6 +1,6 @@
 module github.com/oim
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bytedance/gopkg v0.0.0-20240315062850-21fc7a1671a8
