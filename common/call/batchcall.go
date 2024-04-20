@@ -6,6 +6,7 @@ import (
 )
 
 type Req struct {
+	Flag int
 }
 
 type CallProcess[T any] interface {
@@ -26,6 +27,7 @@ type BatchProcessor[T Req] struct {
 
 func NewBatchProcessor(batchSize int, timeout time.Duration, dataHandler func([]*Req)) *BatchProcessor[Req] {
 	bp := &BatchProcessor[Req]{
+		batchSize:   batchSize,
 		requests:    make([]*Req, 0, batchSize),
 		timeout:     timeout,
 		dataHandler: dataHandler,
@@ -38,9 +40,8 @@ func NewBatchProcessor(batchSize int, timeout time.Duration, dataHandler func([]
 
 func (bp *BatchProcessor[Req]) AddRequest(req *Req) {
 	bp.mu.Lock()
-	defer bp.mu.Unlock()
 	bp.requests = append(bp.requests, req)
-
+	bp.mu.Unlock()
 	if len(bp.requests) >= bp.batchSize {
 		bp.sendRequests()
 	}
@@ -65,12 +66,11 @@ func (bp *BatchProcessor[Req]) processLoop() {
 }
 
 func (bp *BatchProcessor[Req]) sendRequests() {
-	bp.mu.Lock()
-	defer bp.mu.Unlock()
-
 	if len(bp.requests) == 0 {
 		return
 	}
 	bp.dataHandler(bp.requests)
+	bp.mu.Lock()
 	bp.requests = make([]*Req, 0, bp.batchSize)
+	bp.mu.Unlock()
 }
