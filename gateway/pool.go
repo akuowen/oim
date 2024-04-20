@@ -8,7 +8,7 @@ import (
 var WorkPool *bizPool
 
 type bizPool struct {
-	pool *ants.Pool
+	Pool *ants.Pool
 }
 
 func NewPool(size int) {
@@ -18,7 +18,7 @@ func NewPool(size int) {
 
 	}
 	WorkPool = &bizPool{
-		pool: pool,
+		Pool: pool,
 	}
 
 }

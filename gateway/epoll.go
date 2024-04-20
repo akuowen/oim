@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"errors"
 	"fmt"
 	"golang.org/x/sys/unix"
 	"log"
@@ -18,6 +19,7 @@ type Epoll struct {
 	thSize          int
 	connProcessSize int
 	listener        *net.TCPListener
+	runProc         func(con *conn)
 }
 
 type epollDesc struct {
@@ -37,13 +39,13 @@ func NewEpollDesc() (*epollDesc, error) {
 	}, nil
 }
 
-func InitEpoll(listener *net.TCPListener) {
-	epoll = NewEpoll(listener)
+func InitEpoll(listener *net.TCPListener, f func(c *conn)) {
+	epoll = NewEpoll(listener, f)
 	epoll.handleConnEventProcess()
 	epoll.start()
 }
 
-func NewEpoll(listener *net.TCPListener) *Epoll {
+func NewEpoll(listener *net.TCPListener, f func(c *conn)) *Epoll {
 
 	return &Epoll{
 		connChan:        make(chan *conn),
@@ -51,6 +53,7 @@ func NewEpoll(listener *net.TCPListener) *Epoll {
 		thSize:          runtime.NumCPU(),
 		connProcessSize: runtime.NumCPU(),
 		listener:        listener,
+		runProc:         f,
 	}
 }
 
@@ -108,7 +111,7 @@ func (c *Epoll) startEpollHandle() {
 	// 监听epoll 事件
 	for {
 		connections, err := desc.wait(200)
-		if err != nil && err != syscall.EINTR {
+		if err != nil && !errors.Is(syscall.EINTR, err) {
 			fmt.Printf("failed to epoll wait %v\n", err)
 			continue
 		}
@@ -116,7 +119,7 @@ func (c *Epoll) startEpollHandle() {
 			if conn == nil {
 				continue
 			}
-			//WorkPool.pool.Submit()
+			epoll.runProc(conn)
 		}
 	}
 
