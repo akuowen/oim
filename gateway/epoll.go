@@ -19,33 +19,43 @@ type Epoll struct {
 	thSize          int
 	connProcessSize int
 	listener        *net.TCPListener
-	runProc         func(con *conn)
+	runProc         func(con *conn, desc *EpollDesc)
 }
 
-type epollDesc struct {
+type EpollDesc struct {
 	id int64
 	fd int
 }
 
-func NewEpollDesc() (*epollDesc, error) {
+func (e *EpollDesc) remove(c *conn) error {
+	fd := c.fd
+	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_DEL, fd, nil)
+	if err != nil {
+		return err
+	}
+	epoll.registerTable.Delete(fd)
+	return nil
+}
+
+func NewEpollDesc() (*EpollDesc, error) {
 	fd, err := unix.EpollCreate1(0)
 	if err != nil {
 		log.Printf("create epoll fail %s", err)
 		return nil, err
 	}
-	return &epollDesc{
+	return &EpollDesc{
 		id: 0,
 		fd: fd,
 	}, nil
 }
 
-func InitEpoll(listener *net.TCPListener, f func(c *conn)) {
+func InitEpoll(listener *net.TCPListener, f func(c *conn, desc *EpollDesc)) {
 	epoll = NewEpoll(listener, f)
 	epoll.handleConnEventProcess()
 	epoll.start()
 }
 
-func NewEpoll(listener *net.TCPListener, f func(c *conn)) *Epoll {
+func NewEpoll(listener *net.TCPListener, f func(c *conn, desc *EpollDesc)) *Epoll {
 
 	return &Epoll{
 		connChan:        make(chan *conn),
@@ -61,15 +71,15 @@ func (c *Epoll) handleConnEventProcess() {
 	for i := 0; i < c.connProcessSize; i++ {
 		go func() {
 			for {
-				tcpconn, err := c.listener.AcceptTCP()
+				connect, err := c.listener.AcceptTCP()
 				if err != nil {
 					continue
 				}
-				f, err := tcpconn.File()
+				f, err := connect.File()
 				if err != nil {
 					continue
 				}
-				newConn := NewConn(int(f.Fd()), tcpconn)
+				newConn := NewConn(int(f.Fd()), connect)
 				c.addBizConnTask(newConn)
 			}
 		}()
@@ -119,13 +129,13 @@ func (c *Epoll) startEpollHandle() {
 			if conn == nil {
 				continue
 			}
-			epoll.runProc(conn)
+			epoll.runProc(conn, desc)
 		}
 	}
 
 }
 
-func (e *epollDesc) wait(msec int) ([]*conn, error) {
+func (e *EpollDesc) wait(msec int) ([]*conn, error) {
 	events := make([]unix.EpollEvent, 100)
 	n, err := unix.EpollWait(e.fd, events, msec)
 	if err != nil {
@@ -140,7 +150,7 @@ func (e *epollDesc) wait(msec int) ([]*conn, error) {
 	return connections, nil
 }
 
-func (c *epollDesc) addEpollTask(co *conn) error {
+func (c *EpollDesc) addEpollTask(co *conn) error {
 	fd := co.fd
 	err := unix.EpollCtl(c.fd, unix.EPOLL_CTL_ADD, fd, &unix.EpollEvent{
 		Events: unix.EPOLLIN | unix.EPOLLHUP, // 监听可读事件

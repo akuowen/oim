@@ -3,10 +3,34 @@ package tcp
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"net"
 	"time"
 )
+
+func ReadDataWithTimeout(conn *net.TCPConn, buf []byte, timeout time.Duration) error {
+	err := (*conn).SetReadDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return err
+	}
+
+	c, err := (*conn).Read(buf)
+	if err != nil {
+		var opErr *net.OpError
+		if errors.As(err, &opErr) && opErr.Timeout() {
+			// 抛出自定义异常，表示读取超时
+			return fmt.Errorf("read timeout")
+		}
+		return err
+	}
+
+	if c == 0 {
+		return fmt.Errorf("connection closed")
+	}
+
+	return nil
+}
 
 func ReadData(conn *net.TCPConn) ([]byte, error) {
 	var dataLen uint32
