@@ -46,3 +46,11 @@ func IsDebug() bool {
 func getEnv() string {
 	return viper.GetString(ENV)
 }
+
+func Init(path string) {
+	viper.SetConfigFile(path)
+	viper.SetConfigType("yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+}
