@@ -14,6 +14,19 @@ type CallProcess[T any] interface {
 	Close()
 }
 
+type SteamProcess[T Req] struct {
+}
+
+func (s *SteamProcess[T]) AddRequest(T *Req) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *SteamProcess[T]) Close() {
+	//TODO implement me
+	panic("implement me")
+}
+
 var _ CallProcess[Req] = &BatchProcessor[Req]{}
 
 type BatchProcessor[T Req] struct {
